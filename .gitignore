@@ -6,3 +6,7 @@
 py3/halite
 py3/hlt/__pycache__
 
+# C++
+cpp/MyBot.cpp
+cpp/halite
+
