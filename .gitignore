@@ -1,0 +1,8 @@
+# global extensions to ignore
+*.log
+*.hlt
+
+# python
+py3/halite
+py3/hlt/__pycache__
+
