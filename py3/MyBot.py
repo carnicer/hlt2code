@@ -73,17 +73,25 @@ while True:
         if ship.docking_status != ship.DockingStatus.UNDOCKED:
 
             # Skip this ship (by now)
-            continue
+            continue # next ship
             # TODO : if many docked ships, undock some
             # TODO : how to know if many docked ships?
 
         if ship in gDictTargetedPlanets.values() :
-            # Skip this ship, it has a planet already
-            continue
+            # Skip this ship, it has a targeted planet already
+            navigate_command = ship.navigate(
+                ship.closest_point_to(planet),
+                game_map,
+                speed = int(hlt.constants.MAX_SPEED/2),
+                ignore_ships = True
+            )
+            continue # next ship
 
         # for each planet, calculate score for going there ; already targeted
         # planets are discarded ; score depends on size and distance
         lListTup2_shipPlanetScores = []
+
+        lbGotoNextShip = False
 
         # For each planet in the game (only non-destroyed planets are included)
         for planet in game_map.all_planets():
@@ -120,7 +128,10 @@ while True:
                     # remove from this dict
                     gDictTargetedPlanets.pop(planet)
 
+                lbGotoNextShip = True
+
                 # next planet
+                # TODO : ... and next ship!
                 continue
 
             else:
@@ -130,6 +141,9 @@ while True:
                     # TODO : consider position of planet in the quadrant
                 )
                 lListTup2_shipPlanetScores.add((planet, planetScore))
+
+        if lbGotoNextShip == True :
+            continue # next ship, dont issue a navigation to a planet
 
         # TODO : py3, can i get the tuple like that?
         # TODO : lambda decreasing
@@ -177,7 +191,14 @@ while True:
                             ignore_ships = True
                         )
 
+                    else :
+
+                        logging.warning("ship %d without navigation (else of enemyShip == -1)" % ship)
+                        # TODO : navigate somewhere
+                        #pass
+
                 else : # TODO : other conditions
+
                     pass
 
         # for planet ...
@@ -188,6 +209,8 @@ while True:
         if not navigate_command == None :
             command_queue.append(navigate_command)
 
+        else :
+            logging.warning("ship %d without navigation, navigate_command None" % ship)
 
     # for ship ...
 
