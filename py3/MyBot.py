@@ -20,6 +20,25 @@ def scorePlanetToNavigate(distanceToPlanet, planetSize) :
     logging.info("scorePlanetToNavigate. dist=%d, size=%d => score=%d" % (planetSize, distanceToPlanet, score))
     return score
 
+class Counter :
+
+    def __init__(self) :
+        self.miTotal = 0
+        self.miMine = 0
+        self.miNotOwned = 0
+        # owned by others = total - owned by me - not owned
+
+    def countMine(self) :
+        self.miTotal += 1
+        self.miMine += 1
+
+    def countNotOwned(self) :
+        self.miTotal += 1
+        self.miNotOwned += 1
+
+    def countTheirs(self) :
+        self.miTotal += 1
+
 
 # GAME START
 # Here we define the bot's name as 'muke' and initialize the game, including communication with the Halite engine.
@@ -28,18 +47,28 @@ game = hlt.Game(botName)
 # Then we print our start message to the logs
 logging.info("Starting %s bot!" % botName)
 
+# maps planet : ship
+gDictTargetedPlanets = {}
+
+gCounterShips = Counter()
+gCounterPlanets = Counter()
+
 while True:
     # TURN START
     # Update the map for the new turn and get the latest version
     game_map = game.update_map()
 
-    # maps planet : ship
-    myTargetedPlanets = {}
+    lTurnCounterShips = Counter()
+    lTurnCounterPlanets = Counter()
+
 
     # Here we define the set of commands to be sent to the Halite engine at the end of the turn
     command_queue = []
     # For every ship that I control
     for ship in game_map.get_me().all_ships():
+
+        lTurnCounterShips.countMine()
+
         # If the ship is docked
         if ship.docking_status != ship.DockingStatus.UNDOCKED:
 
@@ -48,7 +77,7 @@ while True:
             # TODO : if many docked ships, undock some
             # TODO : how to know if many docked ships?
 
-        if ship in myTargetedPlanets.values() :
+        if ship in gDictTargetedPlanets.values() :
             # Skip this ship, it has a planet already
             continue
 
@@ -58,24 +87,36 @@ while True:
 
         # For each planet in the game (only non-destroyed planets are included)
         for planet in game_map.all_planets():
-            # by now, not discarding ships in myTargetedPlanets
+
+
+            # by now, not discarding ships in gDictTargetedPlanets
 
             # If the planet is owned
             if planet.is_owned():
+
+                if planet.owner == me : # TODO : syntax!
+                    lTurnCounterPlanets.countMine()
+                else :
+                    lTurnCounterPlanets.countTheirs()
+
                 # TODO : depending on game phase, launch attack to owned planets
                 #
                 # -- this is very important!!!
-                # TODO : if planet is not owned by me, remove from myTargetedPlanets
+                # TODO : if planet is not owned by me, remove from gDictTargetedPlanets
                 # -- this is very important!!!
 
                 # Skip this planet
                 continue
 
+            else : # planet not owned
+                lTurnCounterPlanets.countNotOwned()
+
+
             # If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
             if ship.can_dock(planet):
                 # We add the command by appending it to the command_queue
                 command_queue.append(ship.dock(planet))
-                if planet in myTargetedPlanets.keys() :
+                if planet in gDictTargetedPlanets.keys() :
                     # remove from this dict
                     gDictTargetedPlanets.pop(planet)
 
@@ -96,7 +137,7 @@ while True:
 
             navigate_command = None
 
-            if planet not in myTargetedPlanets.keys() :
+            if planet not in gDictTargetedPlanets.keys() :
                 # a cool planet, nobody going there
                 navigate_command = ship.navigate(
                     ship.closest_point_to(planet),
@@ -104,7 +145,7 @@ while True:
                     speed = int(hlt.constants.MAX_SPEED/2),
                     ignore_ships = True
                 )
-                myTargetedPlanets[ planet ] = ship
+                gDictTargetedPlanets[ planet ] = ship
 
             else :
 
@@ -119,6 +160,7 @@ while True:
                     closestShipDistance = -1
                     targetEnemyShip = -1
                     # TODO : attack the closest enemy ship
+                    # TODO : syntax!!!
                     for enemyShip in game_map.get_enemies().all_ships():
                         distance = Distance( ship.closest_point_to(enemyShip) )
                         if targetEnemyShip == -1 or distance < closestShipDistance :
