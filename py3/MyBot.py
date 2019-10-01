@@ -180,11 +180,16 @@ while True:
                 else : # TODO : other conditions
                     pass
 
-            # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
-            # or we are trapped (or we reached our destination!), navigate_command will return null;
-            # don't fret though, we can run the command again the next turn)
-            if not navigate_command == None :
-                command_queue.append(navigate_command)
+        # for planet ...
+
+        # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
+        # or we are trapped (or we reached our destination!), navigate_command will return null;
+        # don't fret though, we can run the command again the next turn)
+        if not navigate_command == None :
+            command_queue.append(navigate_command)
+
+
+    # for ship ...
 
     # Send our set of commands to the Halite engine for this turn
     game.send_command_queue(command_queue)
@@ -192,3 +197,4 @@ while True:
     # TURN END
 
 # GAME END
+
