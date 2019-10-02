@@ -96,7 +96,6 @@ while True:
         # For each planet in the game (only non-destroyed planets are included)
         for planet in game_map.all_planets():
 
-
             # by now, not discarding ships in gDictTargetedPlanets
 
             # If the planet is owned
@@ -145,9 +144,7 @@ while True:
         if lbGotoNextShip == True :
             continue # next ship, dont issue a navigation to a planet
 
-        # TODO : py3, can i get the tuple like that?
-        # TODO : lambda decreasing
-        for planet, score in lListTup2_shipPlanetScores :
+        for planet, score in sorted( lListTup2_shipPlanetScores.items(), key = lambda k : k[1], reverse = True ) :
 
             navigate_command = None
 
