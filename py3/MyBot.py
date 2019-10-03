@@ -79,6 +79,10 @@ while True:
         # If the ship is docked
         if ship.docking_status != ship.DockingStatus.UNDOCKED:
 
+            # TODO : how to know how many docked ships in this planet?
+            ship._link(shipPlayers, shipPlanets)
+            lListShipPlanets = shipPlanets.items()
+
             # Skip this ship (by now)
             continue # next ship
             # TODO : if many docked ships, undock some
