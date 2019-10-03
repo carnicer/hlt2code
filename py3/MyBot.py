@@ -65,7 +65,9 @@ while True:
     # Here we define the set of commands to be sent to the Halite engine at the end of the turn
     command_queue = []
     # For every ship that I control
-    for ship in game_map.get_me().all_ships():
+    lListMyShips = game_map.get_me().all_ships()
+
+    for ship in lListMyShips :
 
         lTurnCounterShips.countMine()
 
@@ -78,6 +80,15 @@ while True:
             # TODO : how to know if many docked ships?
 
         if ship in gDictTargetedPlanets.values() :
+            # If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
+            # TODO : this is a mess
+            if ship.can_dock(planet):
+                # We add the command by appending it to the command_queue
+                command_queue.append(ship.dock(planet))
+                if planet in gDictTargetedPlanets.keys() :
+                    # remove from this dict
+                    gDictTargetedPlanets.pop(planet)
+
             # Skip this ship, it has a targeted planet already
             navigate_command = ship.navigate(
                 ship.closest_point_to(planet),
@@ -142,13 +153,22 @@ while True:
                 lListTup2_shipPlanetScores.add((planet, planetScore))
 
         if lbGotoNextShip == True :
-            continue # next ship, dont issue a navigation to a planet
+            continue # next ship, dont issue a navigation to that planet
 
         for planet, score in sorted( lListTup2_shipPlanetScores.items(), key = lambda k : k[1], reverse = True ) :
 
             navigate_command = None
 
-            if planet not in gDictTargetedPlanets.keys() :
+            if planet in gDictTargetedPlanets.keys() :
+
+                # check that the ship is still alive
+                if ship not in lListMyShips :
+                    # the ship has died
+                    gDictTargetedPlanets.pop(planet)
+                else :
+                    # it will be matched sometime
+                    continue
+
                 # a cool planet, nobody going there
                 navigate_command = ship.navigate(
                     ship.closest_point_to(planet),
