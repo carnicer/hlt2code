@@ -148,7 +148,7 @@ while True:
             else:
                 planetScore = scorePlanetToNavigate(
                     ship.closest_point_to(planet),
-                    getSize(planet),
+                    planet.radius,
                     # TODO : consider position of planet in the quadrant
                 )
                 lListTup2_shipPlanetScores.add((planet, planetScore))
