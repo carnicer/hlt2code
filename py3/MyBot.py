@@ -50,7 +50,7 @@ game = hlt.Game(botName)
 logging.info("Starting %s bot!" % botName)
 
 # TODO : how to get my ID???
-gMyId = None
+gMyId = game.get_me()
 
 # maps planet : ship
 gDictTargetedPlanets = {}
@@ -73,9 +73,6 @@ while True:
     lListMyShips = game_map.get_me().all_ships()
 
     for ship in lListMyShips :
-
-        # obtain my ID
-        if gMyId == None : gMyId = ship.owner
 
         lTurnCounterShips.countMine()
 
