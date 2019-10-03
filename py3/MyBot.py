@@ -17,8 +17,10 @@ def scorePlanetToNavigate(distanceToPlanet, planetSize) :
     # TODO : don't use magic constants / read from config file
     # TODO : check actual planet sizes and distances
     score = planetSize * 40 - distanceToPlanet
-    logging.info("scorePlanetToNavigate. dist=%d, size=%d => score=%d" % (planetSize, distanceToPlanet, score))
+    logging.info("scorePlanetToNavigate. dist=%d, size=%d => score=%d"
+        % (planetSize, distanceToPlanet, score))
     return score
+
 
 class Counter :
 
@@ -79,7 +81,7 @@ while True:
             # TODO : if many docked ships, undock some
             # TODO : how to know if many docked ships?
 
-        if ship in gDictTargetedPlanets.values() :
+        if ship in gDictTargetedPlanets.items() :
             # If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
             # TODO : this is a mess
             if ship.can_dock(planet):
@@ -140,8 +142,7 @@ while True:
 
                 lbGotoNextShip = True
 
-                # next planet
-                # TODO : ... and next ship!
+                # next planet (will go to next ship too)
                 continue
 
             else:
@@ -155,7 +156,9 @@ while True:
         if lbGotoNextShip == True :
             continue # next ship, dont issue a navigation to that planet
 
-        for planet, score in sorted( lListTup2_shipPlanetScores.items(), key = lambda k : k[1], reverse = True ) :
+        for planet in sorted( lListTup2_shipPlanetScores.items()
+            , key = lambda k : k[1]
+            , reverse = True ) :
 
             navigate_command = None
 
@@ -218,7 +221,6 @@ while True:
 
                     pass
 
-        # for planet ...
 
         # If the move is possible, add it to the command_queue (if there are too many obstacles on the way
         # or we are trapped (or we reached our destination!), navigate_command will return null;
