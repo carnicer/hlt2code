@@ -50,7 +50,7 @@ game = hlt.Game(botName)
 logging.info("Starting %s bot!" % botName)
 
 # TODO : how to get my ID???
-gMyId = game_map.get_me()
+gMyId = None
 
 # maps planet : ship
 gDictTargetedPlanets = {}
@@ -74,6 +74,9 @@ while True:
 
     for ship in lListMyShips :
 
+        # obtain my ID
+        if gMyId == None : gMyId = ship.owner
+
         lTurnCounterShips.countMine()
 
         # If the ship is docked
@@ -83,6 +86,7 @@ while True:
             continue # next ship
             # TODO : if many docked ships, undock some
             # TODO : how to know if many docked ships?
+
 
         if ship in gDictTargetedPlanets.items() :
             # If we can dock, let's (try to) dock. If two ships try to dock at once, neither will be able to.
