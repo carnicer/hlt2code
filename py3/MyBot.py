@@ -49,6 +49,9 @@ game = hlt.Game(botName)
 # Then we print our start message to the logs
 logging.info("Starting %s bot!" % botName)
 
+# TODO : how to get my ID???
+gMyId = game_map.get_me()
+
 # maps planet : ship
 gDictTargetedPlanets = {}
 
@@ -114,7 +117,7 @@ while True:
             # If the planet is owned
             if planet.is_owned():
 
-                if planet.owner == me : # TODO : syntax!
+                if planet.owner == gMyId :
                     lTurnCounterPlanets.countMine()
                 else :
                     lTurnCounterPlanets.countTheirs()
